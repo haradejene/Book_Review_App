@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 
+import { Irish_Grover } from "next/font/google";
+
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
@@ -24,10 +26,12 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
-        {children}
+      
+      <body className="relative bg-[#8D27AE]">
+        <div className="fixed inset-0 z-0 bg-[radial-gradient(circle,rgba(0,0,0,0.5)_0%,transparent_70%)]"></div>
+        <div className="relative z-10">
+          {children}
+        </div>
       </body>
     </html>
   );
