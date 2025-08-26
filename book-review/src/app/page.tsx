@@ -5,6 +5,8 @@ const irishgroverFont = Irish_Grover({subsets: ['latin'], weight:'400',})
 export default function Home() {
   return (
     <>
+    <section className= "flex flex-row">
+    <section>
    <div className={`m-6 ${irishgroverFont.className} pt-[149px] pl-[34px] w-[670px] h-[116px]`}>
    <h1 className="text-5xl text-white font-light ">Your Library of Opinions—<br></br>Find What’s Worth Reading.</h1>
     </div>
@@ -29,7 +31,23 @@ export default function Home() {
       <button className={`m-6 ${irishgroverFont.className} w-[309px] h-[66px] bg-white/10 text-white rounded-lg flex items-center justify-center text-lg`}>
          Discover Books </button>
     </div>
-    
+    </section>
+    <section className="pt-[149px] pr-[34px] w-[670px]">
+      <div className="flex space-x-4 overflow-x-auto pb-4 scrollbar-none snap-x snap-mandatory">
+        {/* Placeholder book cards */}
+        {[...Array(10)].map((_, idx) => (
+          <div
+            key={idx}
+            className="flex-none w-[300px] h-[400px] bg-white/10 rounded-lg p-4 text-white snap-start"
+          >
+            <div className="w-full h-[300px] bg-white/25 rounded mb-2"></div>
+            <h3 className="text-lg font-semibold">Book Title {idx + 1}</h3>
+            <p className="text-sm text-gray-300">Author Name</p>
+          </div>
+        ))}
+      </div>
+    </section>
+    </section>
 
     </>
   )
