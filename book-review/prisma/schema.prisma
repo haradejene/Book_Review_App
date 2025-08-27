@@ -1,0 +1,138 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum ReadingStatus {
+  want_to_read
+  reading
+  read
+}
+
+enum ReportStatus {
+  pending
+  reviewed
+  dismissed
+}
+
+model User {
+  id              String          @id @default(cuid())
+  username        String          @unique
+  email           String          @unique
+  passwordHash    String
+  avatarUrl       String?
+  bio             String?
+  reviews         Review[]
+  reviewLikes     ReviewLike[]
+  reviewComments  ReviewComment[]
+  readingLists    ReadingList[]
+  shelves         Shelf[]
+  reports         Report[]
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
+}
+
+model Book {
+  id             String         @id @default(cuid())
+  title          String
+  author         String
+  description    String?
+  aboutAuthor    String?        // <-- NEW: “about the author”
+  coverUrl       String?
+  genre          String?
+  publishedYear  Int?
+  reviews        Review[]
+  readingLists   ReadingList[]
+  shelfBooks     ShelfBook[]
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+}
+
+model Review {
+  id         String          @id @default(cuid())
+  user       User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId     String
+  book       Book            @relation(fields: [bookId], references: [id], onDelete: Cascade)
+  bookId     String
+  rating     Int
+  reviewText String
+  likesCount Int             @default(0)
+  likes      ReviewLike[]
+  comments   ReviewComment[]
+  reports    Report[]
+  createdAt  DateTime        @default(now())
+  updatedAt  DateTime        @updatedAt
+
+  @@unique([userId, bookId]) // each user can review a book only once
+}
+
+model ReviewLike {
+  id        String   @id @default(cuid())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId    String
+  review    Review   @relation(fields: [reviewId], references: [id], onDelete: Cascade)
+  reviewId  String
+  createdAt DateTime @default(now())
+
+  @@unique([userId, reviewId]) // prevent duplicate likes
+}
+
+model ReviewComment {
+  id          String   @id @default(cuid())
+  review      Review   @relation(fields: [reviewId], references: [id], onDelete: Cascade)
+  reviewId    String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId      String
+  commentText String
+  createdAt   DateTime @default(now())
+}
+
+model ReadingList {
+  id        String        @id @default(cuid())
+  user      User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId    String
+  book      Book          @relation(fields: [bookId], references: [id], onDelete: Cascade)
+  bookId    String
+  status    ReadingStatus @default(want_to_read)
+  progress  Int           @default(0)
+  createdAt DateTime      @default(now())
+  updatedAt DateTime      @updatedAt
+
+  @@unique([userId, bookId]) // prevent duplicate entries
+}
+
+model Shelf {
+  id          String      @id @default(cuid())
+  user        User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId      String
+  name        String
+  description String?
+  shelfBooks  ShelfBook[]
+  createdAt   DateTime    @default(now())
+}
+
+model ShelfBook {
+  id       String   @id @default(cuid())
+  shelf    Shelf    @relation(fields: [shelfId], references: [id], onDelete: Cascade)
+  shelfId  String
+  book     Book     @relation(fields: [bookId], references: [id], onDelete: Cascade)
+  bookId   String
+  addedAt  DateTime @default(now())
+
+  @@unique([shelfId, bookId]) // prevent duplicates
+}
+
+model Report {
+  id        String       @id @default(cuid())
+  user      User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId    String
+  review    Review       @relation(fields: [reviewId], references: [id], onDelete: Cascade)
+  reviewId  String
+  reason    String
+  status    ReportStatus @default(pending)
+  createdAt DateTime     @default(now())
+}
