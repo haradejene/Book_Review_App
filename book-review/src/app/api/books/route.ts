@@ -47,7 +47,7 @@ export async function POST() {
           coverUrl: 'https://books.google.com/books/content?id=s1gVAAAAYAAJ&printsec=frontcover&img=1&zoom=1',
           genre: 'Romance',
           publishedYear: 1813,
-        },
+        }, 
       ],
       skipDuplicates: true,
     });
