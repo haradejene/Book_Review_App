@@ -48,6 +48,14 @@ export default function Home() {
       </div>
     </section>
     </section>
+    <div className="pt-[150px] pl-[900px] h-[30px]">
+    <form className=" pt-[150px]h-[30px] w-[450px]  rounded-[10px] bg-white text-black flex pl-4 shadow-lg " method="post">
+    <input className="flex-1 h-full rounded-[10px] outline-none px-2" type="text" placeholder="Search books..." />
+    <button className="pr-4">
+      <img src="/icons/Vector.svg"/>
+    </button>
+    </form>
+    </div>
 
     </>
   )
