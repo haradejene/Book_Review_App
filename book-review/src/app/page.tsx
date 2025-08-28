@@ -3,6 +3,8 @@ import Header from "../components/navigation/Navbar";
 import Footer from "../components/navigation/Footer";
 import { Irish_Grover } from "next/font/google";
 
+
+
 const irishgroverFont = Irish_Grover({ subsets: ["latin"], weight: "400" });
 
 export default function Home() {

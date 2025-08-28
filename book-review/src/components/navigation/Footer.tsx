@@ -50,9 +50,10 @@ const Footer: React.FC = () => {
           <h3 className="text-lg font-semibold text-[#461356] mb-2">User Links</h3>
           <ul className="space-y-1">
             <li>
-              <a href="/signup" className="hover:underline">
-                Sign up / Log in
+              <a href="/auth/signup" className="hover:underline">
+              Sign up / Log in
               </a>
+
             </li>
             <li>
               <a href="/profile" className="hover:underline">
@@ -96,6 +97,7 @@ const Footer: React.FC = () => {
         </div>
       </div>
       </section>
+       <p className="text-left text-xs mt-4">copyright © 2025 Enanbib</p>
     </footer>
   );
 };
