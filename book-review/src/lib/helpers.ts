@@ -17,10 +17,10 @@ export async function comparePassword(password: string, hash: string): Promise<b
 // 🔑 JWT helpers
 const JWT_SECRET = process.env.JWT_SECRET || "supersecretkey";
 
-export function generateToken(userId: string): string {
+export function generateToken(userId: number): string {
   return jwt.sign({ userId }, JWT_SECRET, { expiresIn: "7d" });
 }
 
-export function verifyToken(token: string): any {
-  return jwt.verify(token, JWT_SECRET);
+export function verifyToken(token: string): { userId: number } {
+  return jwt.verify(token, JWT_SECRET) as { userId: number };
 }
