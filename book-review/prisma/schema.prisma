@@ -20,7 +20,7 @@ enum ReportStatus {
 }
 
 model User {
-  id              String          @id @default(cuid())
+  id              Int             @id @default(autoincrement())
   username        String          @unique
   email           String          @unique
   passwordHash    String
@@ -37,11 +37,11 @@ model User {
 }
 
 model Book {
-  id             String         @id @default(cuid())
+  id             Int            @id @default(autoincrement())
   title          String
   author         String
   description    String?
-  aboutAuthor    String?        // <-- NEW: “about the author”
+  aboutAuthor    String?
   coverUrl       String?
   genre          String?
   publishedYear  Int?
@@ -53,11 +53,11 @@ model Book {
 }
 
 model Review {
-  id         String          @id @default(cuid())
+  id         Int             @id @default(autoincrement())
   user       User            @relation(fields: [userId], references: [id], onDelete: Cascade)
-  userId     String
+  userId     Int
   book       Book            @relation(fields: [bookId], references: [id], onDelete: Cascade)
-  bookId     String
+  bookId     Int
   rating     Int
   reviewText String
   likesCount Int             @default(0)
@@ -67,48 +67,48 @@ model Review {
   createdAt  DateTime        @default(now())
   updatedAt  DateTime        @updatedAt
 
-  @@unique([userId, bookId]) // each user can review a book only once
+  @@unique([userId, bookId])
 }
 
 model ReviewLike {
-  id        String   @id @default(cuid())
+  id        Int      @id @default(autoincrement())
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  userId    String
+  userId    Int
   review    Review   @relation(fields: [reviewId], references: [id], onDelete: Cascade)
-  reviewId  String
+  reviewId  Int
   createdAt DateTime @default(now())
 
-  @@unique([userId, reviewId]) // prevent duplicate likes
+  @@unique([userId, reviewId])
 }
 
 model ReviewComment {
-  id          String   @id @default(cuid())
+  id          Int      @id @default(autoincrement())
   review      Review   @relation(fields: [reviewId], references: [id], onDelete: Cascade)
-  reviewId    String
+  reviewId    Int
   user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  userId      String
+  userId      Int
   commentText String
   createdAt   DateTime @default(now())
 }
 
 model ReadingList {
-  id        String        @id @default(cuid())
+  id        Int           @id @default(autoincrement())
   user      User          @relation(fields: [userId], references: [id], onDelete: Cascade)
-  userId    String
+  userId    Int
   book      Book          @relation(fields: [bookId], references: [id], onDelete: Cascade)
-  bookId    String
+  bookId    Int
   status    ReadingStatus @default(want_to_read)
   progress  Int           @default(0)
   createdAt DateTime      @default(now())
   updatedAt DateTime      @updatedAt
 
-  @@unique([userId, bookId]) // prevent duplicate entries
+  @@unique([userId, bookId])
 }
 
 model Shelf {
-  id          String      @id @default(cuid())
+  id          Int         @id @default(autoincrement())
   user        User        @relation(fields: [userId], references: [id], onDelete: Cascade)
-  userId      String
+  userId      Int
   name        String
   description String?
   shelfBooks  ShelfBook[]
@@ -116,22 +116,22 @@ model Shelf {
 }
 
 model ShelfBook {
-  id       String   @id @default(cuid())
+  id       Int      @id @default(autoincrement())
   shelf    Shelf    @relation(fields: [shelfId], references: [id], onDelete: Cascade)
-  shelfId  String
+  shelfId  Int
   book     Book     @relation(fields: [bookId], references: [id], onDelete: Cascade)
-  bookId   String
+  bookId   Int
   addedAt  DateTime @default(now())
 
-  @@unique([shelfId, bookId]) // prevent duplicates
+  @@unique([shelfId, bookId])
 }
 
 model Report {
-  id        String       @id @default(cuid())
+  id        Int          @id @default(autoincrement())
   user      User         @relation(fields: [userId], references: [id], onDelete: Cascade)
-  userId    String
+  userId    Int
   review    Review       @relation(fields: [reviewId], references: [id], onDelete: Cascade)
-  reviewId  String
+  reviewId  Int
   reason    String
   status    ReportStatus @default(pending)
   createdAt DateTime     @default(now())
