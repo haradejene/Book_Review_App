@@ -27,8 +27,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       
-      <body className="relative bg-[#8D27AE]">
-        <div className="fixed inset-0 z-0 bg-[radial-gradient(circle,rgba(0,0,0,0.5)_0%,transparent_70%)]"></div>
+      <body className="relative bg-white">
         <div className="relative z-10">
           {children}
         </div>
