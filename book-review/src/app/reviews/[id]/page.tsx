@@ -6,6 +6,7 @@ import { Star, User, Calendar, MessageSquare } from "lucide-react";
 
 import Navbar from "@/components/navigation/Navbar";
 import Footer from "@/components/navigation/Footer";
+import ReviewForm from "../../../components/reviews/ReviewForm"
 
 import { mockBooks } from "@/lib/mockData";
 import { mockReviews } from "@/lib/mockReviews";
@@ -36,61 +37,13 @@ export default function ReviewPage() {
 
       <main className="flex flex-col lg:flex-row gap-8 p-8 flex-1">
         {/* Left: Book Cover + Ratings */}
-        <div className="lg:w-1/3 flex flex-col items-center">
-          <img
-            src={book.coverUrl}
-            alt={book.title}
-            width={288}
-            height={400}
-            className="rounded-lg shadow-lg"
+        <ReviewForm
+            bookCoverUrl={book.coverUrl}
+            existingReviews={reviews.map((r) => ({
+              rating: r.rating,
+              reviewText: r.review,
+            }))}
           />
-
-          {/* Average Rating */}
-          <div className="flex items-center space-x-1 mt-4">
-            {[...Array(5)].map((_, i) => (
-              <Star
-                key={i}
-                className={`w-6 h-6 ${
-                  i <
-                  Math.round(
-                    reviews.reduce((sum, r) => sum + r.rating, 0) /
-                      reviews.length || 0
-                  )
-                    ? "text-yellow-400 fill-yellow-400"
-                    : "text-gray-400"
-                }`}
-              />
-            ))}
-          </div>
-          <p className="mt-2 text-sm text-gray-700 flex items-center gap-2">
-            <MessageSquare className="w-4 h-4 text-gray-500" />
-            <span>
-              <span className="font-bold">
-                {(
-                  reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length ||
-                  0
-                ).toFixed(1)}
-              </span>{" "}
-              from {reviews.length} reviews
-            </span>
-          </p>
-
-          {/* Review Input */}
-          <div className="flex items-center mt-4 space-x-2">
-            <input
-              type="text"
-              placeholder="Write a review"
-              className="border rounded-lg px-3 py-2 w-48"
-            />
-            <button className="bg-[#461356] text-white px-4 py-2 rounded-lg hover:bg-purple-700">
-              Submit
-            </button>
-          </div>
-
-          <button className="mt-3 px-4 py-2 border rounded-lg hover:bg-gray-200">
-            Add to Shelf
-          </button>
-        </div>
 
         {/* Right: Book Info + Reviews */}
         <div className="lg:w-2/3 flex flex-col">
@@ -98,17 +51,10 @@ export default function ReviewPage() {
 
           {/* Author Info */}
           <div className="flex items-center gap-4 mt-4">
-            <Image
-              src="/placeholder-author.jpg"
-              alt={book.author}
-              width={120}
-              height={64}
-              className="rounded-full object-cover"
-            />
             <div>
               <p className="flex items-center gap-2 font-semibold">
                 <User className="w-4 h-4 text-gray-600" />
-                About the Author
+                About the Author - {book.author}
               </p>
               <p className="text-sm text-gray-700">{book.aboutAuthor}</p>
             </div>
