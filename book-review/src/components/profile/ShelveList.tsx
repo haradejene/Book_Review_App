@@ -1,6 +1,7 @@
 "use client";
 import React, { useState, useEffect } from "react";
 import { mockBooks } from "@/lib/mockData";
+import ProfileHeader from "./ProfileHeader";
 
 interface Book {
   id: string;
@@ -15,6 +16,7 @@ interface Book {
 
 export default function ShelveList() {
   const [books, setBooks] = useState<Book[]>([]);
+  const [filteredBooks, setFilteredBooks] = useState<Book[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -24,9 +26,11 @@ export default function ShelveList() {
         if (!res.ok) throw new Error("API failed");
         const data = await res.json();
         setBooks(data);
+        setFilteredBooks(data);
       } catch (err) {
         console.warn("Failed to fetch from API, using mock data:", err);
         setBooks(mockBooks);
+        setFilteredBooks(mockBooks);
       } finally {
         setLoading(false);
       }
@@ -34,10 +38,23 @@ export default function ShelveList() {
     fetchBooks();
   }, []);
 
+  const handleSearch = (query: string) => {
+    const lowerQuery = query.toLowerCase();
+    setFilteredBooks(
+      books.filter((book) =>
+        book.title.toLowerCase().includes(lowerQuery) ||
+        book.author.toLowerCase().includes(lowerQuery) ||
+        book.genre.toLowerCase().includes(lowerQuery)
+      )
+    );
+  };
+
   if (loading) return <p>Loading...</p>;
 
   return (
     <>
+      <ProfileHeader onSearch={handleSearch} />
+
       <section className="pl-[200px] pt-[100px]">
         <div className="flex flex-col gap-4">
           {/* Header */}
@@ -49,7 +66,7 @@ export default function ShelveList() {
 
           {/* Scrollable container for books */}
           <div className="flex flex-col gap-4 h-[330px] overflow-y-auto">
-            {books.map((book) => (
+            {filteredBooks.map((book) => (
               <div
                 key={book.id}
                 className="w-[985px] h-[153px] bg-white shadow-lg rounded-lg flex items-center p-4"
@@ -69,7 +86,9 @@ export default function ShelveList() {
                 </div>
 
                 {/* Middle: Genre */}
-                <div className="font-bold text-center pl-[70px]  min-w-[100px]">{book.genre}</div>
+                <div className="font-bold text-center pl-[70px] min-w-[100px]">
+                  {book.genre}
+                </div>
 
                 {/* Right: Icon + number */}
                 <div className="flex items-center pl-[250px] gap-2">
@@ -82,7 +101,7 @@ export default function ShelveList() {
                   <img
                     src="/icons/mdi_trash.svg"
                     alt="icon"
-                    className=" object-contain pl-[20px] "
+                    className="object-contain pl-[20px]"
                   />
                 </div>
               </div>
@@ -90,55 +109,53 @@ export default function ShelveList() {
           </div>
         </div>
       </section>
+       {/* Review History Section */}
       <section className="pl-[200px] pt-[100px]">
-          <div className="w-[985px] h-[500px] bg-[#461356]/25">
-            <div className="relative z-10">
-             <h1 className="font-bold m-5">Review History</h1>
-             {/* Scrollable container for books */}
-          <div className="flex flex-col gap-4 h-[350px] overflow-y-auto">
-            {books.map((book) => (
-              <div
-                key={book.id}
-                className="flex justify-between items-center m-5 h-[200px] w-[930px] border-b border-black"
-              >
-                {/* Left: Cover + Info */}
-                <div className="flex items-center flex-col gap-4">
-                  <img
-                    src={book.coverUrl}
-                    alt={book.title}
-                    className="w-24 h-32 object-cover rounded-md"
-                  />
-                  <div className="flex flex-col justify-center">
-                    <h2 className="text-sm font-extralight">{book.title}</h2>
-                    <div className="flex items-center gap-2">
-                  <img
-                    src="/Frame 6.svg"
-                    alt="icon"
-                    className="w-30 h-15 object-contain"
-                  />
-                  <h1 className="font-bold underline text-lg">4</h1>
-                </div>
+        <div className="w-[985px] h-[500px] bg-[#461356]/25">
+          <div className="relative z-10">
+            <h1 className="font-bold m-5">Review History</h1>
+            <div className="flex flex-col gap-4 h-[350px] overflow-y-auto">
+              {books.map((book) => (
+                <div
+                  key={book.id}
+                  className="flex justify-between items-center m-5 h-[200px] w-[930px] border-b border-black"
+                >
+                  {/* Left: Cover + Info */}
+                  <div className="flex items-center flex-col gap-4">
+                    <img
+                      src={book.coverUrl}
+                      alt={book.title}
+                      className="w-24 h-32 object-cover rounded-md"
+                    />
+                    <div className="flex flex-col justify-center">
+                      <h2 className="text-sm font-extralight">{book.title}</h2>
+                      <div className="flex items-center gap-2">
+                        <img
+                          src="/Frame 6.svg"
+                          alt="icon"
+                          className="w-30 h-15 object-contain"
+                        />
+                        <h1 className="font-bold underline text-lg">4</h1>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Middle: Genre */}
+                  <div className="font-bold text-center min-w-[100px]">{book.genre}</div>
+
+                  {/* Right: Icon */}
+                  <div className="flex items-center gap-2">
+                    <img
+                      src="/icons/mdi_trash.svg"
+                      alt="icon"
+                      className="object-contain"
+                    />
                   </div>
                 </div>
-
-                {/* Middle: Genre */}
-                <div className="font-bold text-center min-w-[100px]">{book.genre}</div>
-
-                {/* Right: Icon */}
-                <div className="flex items-center gap-2">
-                  <img
-                    src="/icons/mdi_trash.svg"
-                    alt="icon"
-                    className=" object-contain "
-                  />
-    
-                </div>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
-
-             </div> 
-          </div>
+        </div>
       </section>
     </>
   );
