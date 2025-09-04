@@ -178,8 +178,8 @@ export default function Books({ selectedCategory, setSelectedCategory }: BookCar
           <div className="col-span-1 sm:col-span-2 text-center">
             {selectedCategory ? (
               <div className="space-y-4">
-                <p className="text-gray-500 text-lg">
-                  No books found in the "{selectedCategory}" category.
+                <p className={`text-gray-500 text-lg">
+                  No books found in the "{selectedCategory}" category.`}>
                 </p>
                 <button
                   onClick={clearFilter}

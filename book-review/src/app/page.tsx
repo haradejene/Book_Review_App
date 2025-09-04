@@ -4,7 +4,6 @@ import Header from "../components/navigation/Navbar";
 import Footer from "../components/navigation/Footer";
 import { Irish_Grover } from "next/font/google";
 import { mockBooks } from "@/lib/mockData";
-import Link from "next/link";
 import Books from "../components/books/BookDetails";
 import Book from "../components/books/BookCard";
 
@@ -115,12 +114,12 @@ export default function Home() {
               </div>
 
               <div className="px-4 lg:pl-[40px] pt-6">
-                <button
+                  <button
                   onClick={scrollToBookCards}
                   className={`${irishgroverFont.className} w-full sm:w-[250px] lg:w-[309px] h-[50px] sm:h-[60px] lg:h-[66px] bg-white/10 text-white rounded-lg flex items-center justify-center text-base sm:text-lg hover:bg-white/20 transition-colors cursor-pointer`}
-                >
-                  Discover Books
-                </button>
+                  >
+                    Discover Books
+                  </button>
               </div>
             </section>
 

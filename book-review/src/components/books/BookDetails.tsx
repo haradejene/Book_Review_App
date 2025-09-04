@@ -122,12 +122,12 @@ export default function Books({ selectedCategory, setSelectedCategory }: BookDet
             selectedCategory === book.genre ? 'ring-4 ring-[#8D27AE] shadow-lg' : ''
           }`}
           onClick={() => handleCategoryClick(book.genre)}
-          style={{
-            backgroundImage: `url('/Rectangle 36.svg')`,
-            backgroundSize: "cover",
-            backgroundPosition: "center",
-          }}
-        >
+  style={{
+    backgroundImage: `url('/Rectangle 36.svg')`,
+    backgroundSize: "cover",
+    backgroundPosition: "center",
+  }}
+>
   <div className="absolute inset-0 bg-[#601A76] opacity-50"></div>
           <div className="relative z-10 flex flex-col items-center">
           <p className="text-xs sm:text-sm font-semibold text-white text-center">{book.genre}</p>
