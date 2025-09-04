@@ -1,7 +1,9 @@
-"use client"
+ "use client"
 import React from "react";
 import { Irish_Grover } from "next/font/google";
 import {useState, useEffect} from "react";
+import { useRouter } from "next/navigation";
+import Image from "next/image";
 import { mockBooks } from "@/lib/mockData";
 
 const irishgroverFont = Irish_Grover({ subsets: ["latin"], weight: "400" });
@@ -16,20 +18,24 @@ interface Book {
   genre: string;
   publishedYear: number;
 }
-export default function Books() {
-  const [books, setBooks] = useState<Book[]>([]);
+
+interface BookDetailsProps {
+  selectedCategory: string;
+  setSelectedCategory: (category: string) => void;
+}
+
+export default function Books({ selectedCategory, setSelectedCategory }: BookDetailsProps) {
   const [loading, setLoading] = useState(true);
+  const router = useRouter();
 
   useEffect(() => {
     async function fetchBooks() {
       try {
         const res = await fetch("/api/books");
          if (!res.ok) throw new Error("API failed");
-        const data = await res.json();
-        setBooks(data);
+        // Data is fetched but not stored since component uses mockBooks directly
       } catch (err) {
         console.warn("Failed to fetch from API, using mock data:", err);
-        setBooks(mockBooks);
       } finally {
         setLoading(false);
       }
@@ -40,44 +46,59 @@ export default function Books() {
 
   if (loading) return <p>Loading...</p>;
 
-  
+  const handleCategoryClick = (category: string) => {
+    if (selectedCategory === category) {
+      // If clicking the same category, clear the filter
+      setSelectedCategory("");
+    } else {
+      // Set the new selected category
+      setSelectedCategory(category);
+    }
+  };
+
+  const handleRateClick = (bookId: string) => {
+    router.push(`/reviews/${bookId}`);
+  };
 
   return (
     <>
       <section className="bg-white">
         <div className="flex justify-center">
-          <div className="flex justify-center flex-col w-[700px] items-center" >
-            <h1 className={`${irishgroverFont.className} text-[#601A76] text-[48px] pb-4`}>Treanding This Week</h1>
-            <p className="w-[550px] h-[87px] text-center pb-4">Here’s what everyone’s buzzing about this week! From page-turners that keep you up all night to hidden gems you’ll want to tell your friends about, these books are stealing the spotlight right now.</p>
+          <div className="flex justify-center flex-col w-full sm:w-[700px] items-center px-4 sm:px-0" >
+            <h1 className={`${irishgroverFont.className} text-[#601A76] text-[32px] sm:text-[40px] md:text-[48px] pb-4 text-center`}>Treanding This Week</h1>
+            <p className="w-full sm:w-[550px] h-auto sm:h-[87px] text-center pb-4 text-sm sm:text-base">Here&apos;s what everyone&apos;s buzzing about this week! From page-turners that keep you up all night to hidden gems you&apos;ll want to tell your friends about, these books are stealing the spotlight right now.</p>
           </div>
         </div>
-        <div className="flex space-x-4 overflow-x-auto pb-4 scrollbar-none snap-x snap-mandatory px-4 gap-10 ml-2">
+        <div className="flex space-x-2 sm:space-x-4 overflow-x-auto pb-4 scrollbar-none snap-x snap-mandatory px-2 sm:px-4 gap-4 sm:gap-10 mx-auto sm:ml-2">
   {Array(5)
     .fill(mockBooks)
     .flat()
     .map((book, index) => (
       <div
         key={`${book.id}-${index}`}
-        className="flex-none w-[300px] snap-start flex flex-col items-center"
+        className="flex-none w-[200px] sm:w-[250px] md:w-[300px] snap-start flex flex-col items-center"
       >
         {/* Book Cover */}
         <div
-          className="w-[300px] h-[400px] rounded-[25px] transition-shadow duration-300 hover:shadow-[0_0_20px_#601A76] bg-center bg-cover m-4"
+          className="w-[200px] h-[267px] sm:w-[250px] sm:h-[333px] md:w-[300px] md:h-[400px] rounded-[25px] transition-shadow duration-300 hover:shadow-[0_0_20px_#601A76] bg-center bg-cover m-2 sm:m-4"
           style={{ backgroundImage: `url(${book.coverUrl})` }}
         ></div>
 
         {/* Title & Author */}
-        <div className="flex flex-col items-center text-center mb-4">
-          <h3 className="text-lg font-semibold">{book.title}</h3>
-          <p className="text-sm">{book.author}</p>
+        <div className="flex flex-col items-center text-center mb-4 px-2">
+          <h3 className="text-base sm:text-lg font-semibold">{book.title}</h3>
+          <p className="text-xs sm:text-sm">{book.author}</p>
         </div>
 
         {/* Buttons */}
-        <div className="flex gap-3">
-          <button className={`${irishgroverFont.className} bg-white text-[#601A76] shadow-lg w-[93px] h-[35px] flex items-center justify-center rounded-[25px]`}>
+        <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 w-full px-2">
+          <button 
+            onClick={() => handleRateClick(book.id)}
+            className={`${irishgroverFont.className} bg-white text-[#601A76] shadow-lg w-full sm:w-[93px] h-[35px] flex items-center justify-center rounded-[25px] text-sm cursor-pointer hover:bg-gray-50 transition-colors`}
+          >
             Rate
           </button>
-          <button className={`${irishgroverFont.className} bg-[#601A76] text-white shadow-lg w-[138px] h-[35px] flex items-center justify-center rounded-[25px]`}>
+          <button className={`${irishgroverFont.className} bg-[#601A76] text-white shadow-lg w-full sm:w-[138px] h-[35px] flex items-center justify-center rounded-[25px] text-sm`}>
             Add to shelf
           </button>
         </div>
@@ -86,33 +107,33 @@ export default function Books() {
        </div>
            </section>
       <section>
-  <h1 className={`${irishgroverFont.className} text-[#601A76] text-[48px] pb-4 mt-10 ml-2`}>
+  <h1 className={`${irishgroverFont.className} text-[#601A76] text-[32px] sm:text-[40px] md:text-[48px] pb-4 mt-6 sm:mt-10 mx-2 sm:ml-2 text-center sm:text-left`}>
     Categories
   </h1>
 
-  <div className="flex space-x-4 overflow-x-auto pb-4 scrollbar-none snap-x snap-mandatory px-4 gap-5 ml-2">
+  <div className="flex space-x-2 sm:space-x-4 overflow-x-auto pb-4 scrollbar-none snap-x snap-mandatory px-2 sm:px-4 gap-3 sm:gap-5 mx-auto sm:ml-2">
     {Array(5)
       .fill(mockBooks)
       .flat()
       .map((book, index) => (
         <div
           key={`${book.id}-${index}`}
-  className="relative flex-none w-[244px] h-[113px] snap-start flex flex-col items-center justify-center p-4 rounded-[25px] overflow-hidden "
-  
-  style={{
-    backgroundImage: `url('/Rectangle 36.svg')`,
-    backgroundSize: "cover",
-    backgroundPosition: "center",
-  }}
- 
-
->
+          className={`relative flex-none w-[180px] sm:w-[200px] md:w-[244px] h-[80px] sm:h-[100px] md:h-[113px] snap-start flex flex-col items-center justify-center p-2 sm:p-4 rounded-[25px] overflow-hidden cursor-pointer transition-all duration-300 hover:scale-105 ${
+            selectedCategory === book.genre ? 'ring-4 ring-[#8D27AE] shadow-lg' : ''
+          }`}
+          onClick={() => handleCategoryClick(book.genre)}
+          style={{
+            backgroundImage: `url('/Rectangle 36.svg')`,
+            backgroundSize: "cover",
+            backgroundPosition: "center",
+          }}
+        >
   <div className="absolute inset-0 bg-[#601A76] opacity-50"></div>
-          <div className="relative z-10 flex flex-col">
-          <p className="text-sm font-semibold text-white">{book.genre}</p>
+          <div className="relative z-10 flex flex-col items-center">
+          <p className="text-xs sm:text-sm font-semibold text-white text-center">{book.genre}</p>
           <div className="flex gap-1 flex-row">
-          <img className="w-[70px] h-[36px]" src="/icons/200+.svg"/>
-          <img src="/icons/tabler_books.svg"/>
+          <Image className="w-[50px] h-[25px] sm:w-[60px] sm:h-[30px] md:w-[70px] md:h-[36px]" src="/icons/200+.svg" alt="200+" width={70} height={36}/>
+          <Image className="w-[20px] h-[20px] sm:w-[24px] sm:h-[24px] md:w-[24px] md:h-[24px]" src="/icons/tabler_books.svg" alt="books" width={24} height={24}/>
           </div>
 
           </div>
@@ -123,4 +144,4 @@ export default function Books() {
 
     </>
   );
-}
+}                           

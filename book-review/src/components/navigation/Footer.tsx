@@ -1,18 +1,22 @@
 import React from "react";
 import { FaFacebook, FaTwitter, FaInstagram } from "react-icons/fa";
 import { Irish_Grover } from "next/font/google";
+import Link from "next/link";
+
 const irishgroverFont = Irish_Grover({ subsets: ["latin"], weight: "400" });
 
 const Footer: React.FC = () => {
   return (
-    <footer className="bg-white text-[#461356] py-10 px-8 mt-12">
+    <footer className="bg-white text-[#461356] py-10 px-8 mt-12 pt-16">
     <section>
       <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-8">
         {/* Logo + description */}
         <div>
-          <h1 className={`${irishgroverFont.className} text-xl font-bold text-[#461356]`}>Enanbib</h1>
+          <Link href="/" className={`${irishgroverFont.className} text-xl font-bold text-[#461356] hover:text-[#8D27AE] transition-colors`}>
+            Enanbib
+          </Link>
           <p className="mt-2 text-sm">
-            Your Library of Opinions — Find What’s Worth Reading.
+            Your Library of Opinions — Find What&apos;s Worth Reading.
           </p>
         </div>
 
@@ -23,24 +27,19 @@ const Footer: React.FC = () => {
           </h3>
           <ul className="space-y-1">
             <li>
-              <a href="/" className="hover:underline">
+              <Link href="/" className="hover:underline hover:text-[#8D27AE] transition-colors">
                 Home
-              </a>
+              </Link>
             </li>
             <li>
-              <a href="/books" className="hover:underline">
+              <Link href="/books" className="hover:underline hover:text-[#8D27AE] transition-colors">
                 Books
-              </a>
+              </Link>
             </li>
             <li>
-              <a href="/user" className="hover:underline">
+              <Link href="/profile/user" className="hover:underline hover:text-[#8D27AE] transition-colors">
                 User
-              </a>
-            </li>
-            <li>
-              <a href="/about" className="hover:underline">
-                About
-              </a>
+              </Link>
             </li>
           </ul>
         </div>
@@ -50,32 +49,31 @@ const Footer: React.FC = () => {
           <h3 className="text-lg font-semibold text-[#461356] mb-2">User Links</h3>
           <ul className="space-y-1">
             <li>
-              <a href="/auth/signup" className="hover:underline">
+              <Link href="/auth/signup" className="hover:underline hover:text-[#8D27AE] transition-colors">
               Sign up / Log in
-              </a>
-
+              </Link>
             </li>
             <li>
-              <a href="/profile" className="hover:underline">
+              <Link href="/profile/user" className="hover:underline hover:text-[#8D27AE] transition-colors">
                 Profile
-              </a>
+              </Link>
             </li>
             <li>
-              <a href="/review" className="hover:underline">
+              <Link href="/reviews/1" className="hover:underline hover:text-[#8D27AE] transition-colors">
                 Write a Review
-              </a>
+              </Link>
             </li>
           </ul>
         </div>
         {/* Social icons */}
         <div className="flex space-x-4 mt-2 md:mt-0">
-          <a href="#" className="hover:text-white">
+          <a href="#" className="hover:text-[#8D27AE] transition-colors">
             <FaFacebook />
           </a>
-          <a href="#" className="hover:text-white">
+          <a href="#" className="hover:text-[#8D27AE] transition-colors">
             <FaTwitter />
           </a>
-          <a href="#" className="hover:text-white">
+          <a href="#" className="hover:text-[#8D27AE] transition-colors">
             <FaInstagram />
           </a>
         </div>
@@ -88,12 +86,12 @@ const Footer: React.FC = () => {
 
         {/* Policy links */}
         <div className="flex space-x-4 text-sm mt-2 md:mt-0">
-          <a href="/privacy" className="hover:underline">
+          <Link href="/privacy" className="hover:underline hover:text-[#8D27AE] transition-colors">
             Privacy Policy
-          </a>
-          <a href="/terms" className="hover:underline">
+          </Link>
+          <Link href="/terms" className="hover:underline hover:text-[#8D27AE] transition-colors">
             Terms of Service
-          </a>
+          </Link>
         </div>
       </div>
       </section>

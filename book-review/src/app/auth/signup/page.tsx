@@ -28,6 +28,7 @@ export default function SignupPage() {
       });
 
       const data = await res.json();
+      console.log("Response from backend:", data);
 
       if (!res.ok) {
         setError(data.error || "Signup failed");

@@ -1,7 +1,9 @@
 "use client";
 import React, { useState, useEffect } from "react";
+import Image from "next/image";
 import { mockBooks } from "@/lib/mockData";
 import ProfileHeader from "./ProfileHeader";
+import { calculateAverageRating, getMockReviewsForBook } from "@/lib/ratingUtils";
 
 interface Book {
   id: string;
@@ -49,30 +51,31 @@ export default function ShelveList() {
     );
   };
 
-  if (loading) return <p>Loading...</p>;
+  if (loading) return <p className="text-center mt-10">Loading...</p>;
 
   return (
     <>
       <ProfileHeader onSearch={handleSearch} />
 
-      <section className="pl-[200px] pt-[100px]">
-        <div className="flex flex-col gap-4">
+      {/* Shelf Section */}
+      <section className="px-4 sm:px-6 pt-10 flex justify-center">
+        <div className="flex flex-col gap-4 max-w-full mx-auto">
           {/* Header */}
-          <div className="w-[985px] h-[62px] bg-[#461356] flex justify-between items-center px-6 py-4 rounded-lg">
-            <h1 className="text-white">Shelf</h1>
-            <h1 className="text-white">Genre</h1>
-            <h1 className="text-white">Overall Review</h1>
+          <div className="flex flex-col sm:flex-row justify-between items-center sm:items-start w-full max-w-[985px] h-auto sm:h-[62px] bg-[#461356] flex-wrap px-4 sm:px-6 py-4 rounded-lg gap-2 sm:gap-0">
+            <h1 className="text-white w-full sm:w-auto text-center sm:text-left">Shelf</h1>
+            <h1 className="text-white w-full sm:w-auto text-center sm:text-left">Genre</h1>
+            <h1 className="text-white w-full sm:w-auto text-center sm:text-left">Overall Review</h1>
           </div>
 
           {/* Scrollable container for books */}
-          <div className="flex flex-col gap-4 h-[330px] overflow-y-auto">
+          <div className="flex flex-col gap-4 h-[330px] overflow-y-auto max-w-full">
             {filteredBooks.map((book) => (
               <div
                 key={book.id}
-                className="w-[985px] h-[153px] bg-white shadow-lg rounded-lg flex items-center p-4"
+                className="flex flex-col sm:flex-row sm:items-center w-full max-w-[985px] bg-white shadow-lg rounded-lg p-4 gap-4"
               >
                 {/* Left: Cover + Info */}
-                <div className="flex items-center gap-4 w-80">
+                <div className="flex items-center gap-4 w-full sm:w-80">
                   <img
                     src={book.coverUrl}
                     alt={book.title}
@@ -86,22 +89,24 @@ export default function ShelveList() {
                 </div>
 
                 {/* Middle: Genre */}
-                <div className="font-bold text-center pl-[70px] min-w-[100px]">
-                  {book.genre}
-                </div>
+                <div className="font-bold text-center sm:pl-[70px] min-w-[100px]">{book.genre}</div>
 
                 {/* Right: Icon + number */}
-                <div className="flex items-center pl-[250px] gap-2">
-                  <img
+                <div className="flex items-center sm:pl-[250px] gap-2">
+                  <Image
                     src="/Frame 6.svg"
-                    alt="icon"
+                    alt="rating"
+                    width={120}
+                    height={30}
                     className="w-30 h-15 object-contain"
                   />
-                  <h1 className="font-bold underline text-lg">4</h1>
-                  <img
+                  <h1 className="font-bold underline text-lg">{calculateAverageRating(getMockReviewsForBook(book.id))}</h1>
+                  <Image
                     src="/icons/mdi_trash.svg"
-                    alt="icon"
-                    className="object-contain pl-[20px]"
+                    alt="delete"
+                    width={20}
+                    height={20}
+                    className="object-contain sm:pl-[20px]"
                   />
                 </div>
               </div>
@@ -109,51 +114,54 @@ export default function ShelveList() {
           </div>
         </div>
       </section>
-       {/* Review History Section */}
-      <section className="pl-[200px] pt-[100px]">
-        <div className="w-[985px] h-[500px] bg-[#461356]/25">
-          <div className="relative z-10">
-            <h1 className="font-bold m-5">Review History</h1>
-            <div className="flex flex-col gap-4 h-[350px] overflow-y-auto">
-              {books.map((book) => (
-                <div
-                  key={book.id}
-                  className="flex justify-between items-center m-5 h-[200px] w-[930px] border-b border-black"
-                >
-                  {/* Left: Cover + Info */}
-                  <div className="flex items-center flex-col gap-4">
-                    <img
-                      src={book.coverUrl}
-                      alt={book.title}
-                      className="w-24 h-32 object-cover rounded-md"
-                    />
-                    <div className="flex flex-col justify-center">
-                      <h2 className="text-sm font-extralight">{book.title}</h2>
-                      <div className="flex items-center gap-2">
-                        <img
-                          src="/Frame 6.svg"
-                          alt="icon"
-                          className="w-30 h-15 object-contain"
-                        />
-                        <h1 className="font-bold underline text-lg">4</h1>
-                      </div>
+
+      {/* Review History Section */}
+      <section className="px-4 sm:px-6 pt-10 flex justify-center pb-10">
+        <div className="w-full max-w-[985px] bg-[#461356]/25 mx-auto rounded-lg p-4">
+          <h1 className="font-bold m-5">Review History</h1>
+          <div className="flex flex-col gap-4 h-[350px] overflow-y-auto">
+            {books.map((book) => (
+              <div
+                key={book.id}
+                className="flex flex-col sm:flex-row justify-between items-start sm:items-center w-full border-b border-black p-4 gap-4"
+              >
+                {/* Left: Cover + Info */}
+                <div className="flex items-center flex-col sm:flex-row gap-4">
+                  <img
+                    src={book.coverUrl}
+                    alt={book.title}
+                    className="w-24 h-32 object-cover rounded-md"
+                  />
+                  <div className="flex flex-col justify-center">
+                    <h2 className="text-sm font-extralight">{book.title}</h2>
+                    <div className="flex items-center gap-2">
+                      <Image
+                        src="/Frame 6.svg"
+                        alt="rating"
+                        width={120}
+                        height={30}
+                        className="w-30 h-15 object-contain"
+                      />
+                      <h1 className="font-bold underline text-lg">{calculateAverageRating(getMockReviewsForBook(book.id))}</h1>
                     </div>
                   </div>
-
-                  {/* Middle: Genre */}
-                  <div className="font-bold text-center min-w-[100px]">{book.genre}</div>
-
-                  {/* Right: Icon */}
-                  <div className="flex items-center gap-2">
-                    <img
-                      src="/icons/mdi_trash.svg"
-                      alt="icon"
-                      className="object-contain"
-                    />
-                  </div>
                 </div>
-              ))}
-            </div>
+
+                {/* Middle: Genre */}
+                <div className="font-bold text-center min-w-[100px]">{book.genre}</div>
+
+                {/* Right: Icon */}
+                <div className="flex items-center gap-2">
+                  <Image
+                    src="/icons/mdi_trash.svg"
+                    alt="delete"
+                    width={20}
+                    height={20}
+                    className="object-contain"
+                  />
+                </div>
+              </div>
+            ))}
           </div>
         </div>
       </section>

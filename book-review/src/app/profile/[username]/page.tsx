@@ -20,7 +20,7 @@ export default function ProfilePage({ params }: ProfilePageProps) {
 
   return (
     <>
-    <div className="p-6">
+    <div className="p-6 flex justify-center">
       <h1 className={`${irishgroverFont.className} text-2xl text-[#461356]`}>
         Welcome {mockUser.username}
       </h1>
