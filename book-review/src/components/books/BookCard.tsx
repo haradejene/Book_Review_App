@@ -4,7 +4,8 @@ import { Irish_Grover } from "next/font/google";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { calculateAverageRating, getMockReviewsForBook } from "../../lib/ratingUtils";
-import { requireAuth, addBookToDefaultShelf } from "@/lib/auth";
+import { requireAuth } from "@/lib/auth";
+import { useShelf } from "@/context/ShelfContext";
 
 const irishgroverFont = Irish_Grover({ subsets: ["latin"], weight: "400" });
 
@@ -27,7 +28,9 @@ interface BookCardProps {
 
 export default function Books({ books, selectedCategory, setSelectedCategory }: BookCardProps) {
   const [searchTerm, setSearchTerm] = useState("");
+  const [addingToShelf, setAddingToShelf] = useState<Set<number>>(new Set());
   const router = useRouter();
+  const { addBookToShelf } = useShelf();
 
   // Filter books by search term and selected category
   const filteredBooks = books.filter((book) => {
@@ -53,15 +56,31 @@ export default function Books({ books, selectedCategory, setSelectedCategory }: 
     router.push(`/reviews/${bookId}`);
   };
 
-  const handleAddToShelf = async (bookId: number) => {
+  const handleAddToShelf = async (book: Book) => {
     const token = requireAuth(router.push);
     if (!token) return;
+    
+    const bookId = Number(book.id);
+    setAddingToShelf(prev => new Set(prev).add(bookId));
+    
     try {
-      await addBookToDefaultShelf(bookId);
-      alert("Added to shelf");
+      const bookToAdd = {
+        id: bookId,
+        title: book.title,
+        author: book.author,
+        coverUrl: book.coverUrl,
+        genre: book.genre,
+        publishedYear: book.publishedYear,
+      };
+      await addBookToShelf(bookToAdd);
     } catch (e) {
       console.error(e);
-      alert("Failed to add to shelf");
+    } finally {
+      setAddingToShelf(prev => {
+        const newSet = new Set(prev);
+        newSet.delete(bookId);
+        return newSet;
+      });
     }
   };
 
@@ -158,8 +177,12 @@ export default function Books({ books, selectedCategory, setSelectedCategory }: 
                   </div>
 
                   <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-2 mt-4">
-                    <button onClick={() => handleAddToShelf(Number(book.id))} className="bg-[#8D27AE] text-white px-4 py-1 rounded-full text-sm shadow hover:bg-[#6b1d8e] transition">
-                      Add to Shelf
+                    <button 
+                      onClick={() => handleAddToShelf(book)} 
+                      disabled={addingToShelf.has(Number(book.id))}
+                      className="bg-[#8D27AE] text-white px-4 py-1 rounded-full text-sm shadow hover:bg-[#6b1d8e] transition disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      {addingToShelf.has(Number(book.id)) ? "Adding..." : "Add to Shelf"}
                     </button>
                     <button
                       onClick={() => handleRateClick(book.id)}

@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import { ShelfProvider } from "@/context/ShelfContext";
 
 export const metadata: Metadata = {
   title: {
@@ -25,9 +26,11 @@ export default function RootLayout({
     <html lang="en">
       
       <body className="relative bg-white">
-        <div className="relative z-10">
-          {children}
-        </div>
+        <ShelfProvider>
+          <div className="relative z-10">
+            {children}
+          </div>
+        </ShelfProvider>
       </body>
     </html>
   );

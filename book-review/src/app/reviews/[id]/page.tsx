@@ -101,6 +101,10 @@ export default function ReviewPage() {
         {/* Left: Book Cover + Review Form */}
         <ReviewForm
           bookCoverUrl={book.coverUrl}
+          bookTitle={book.title}
+          bookAuthor={book.author}
+          bookGenre={book.genre}
+          bookPublishedYear={book.publishedYear}
           existingReviews={reviews.map((r) => ({
             rating: r.rating,
             reviewText: r.review,

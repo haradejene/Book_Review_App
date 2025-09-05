@@ -4,6 +4,7 @@ import { Irish_Grover } from "next/font/google";
 import { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { authFetch, apiUrl } from "@/lib/auth";
 
 const irishgroverFont = Irish_Grover({ subsets: ["latin"], weight: "400" });
 
@@ -24,16 +25,36 @@ export default function ProfileHeader({ onSearch }: ProfileHeaderProps) {
   const [editUsername, setEditUsername] = useState("");
 
   useEffect(() => {
-    // Get user data from localStorage or API
-    const token = localStorage.getItem("token");
-    if (token) {
-      // In a real app, you'd decode the token or fetch user data
-      // For now, using mock data
-      setUser({
-        username: "Robert Karlos",
-        email: "robert@example.com"
-      });
+    async function fetchUserData() {
+      const token = localStorage.getItem("token");
+      if (token) {
+        try {
+          // Try to fetch user data from API
+          const response = await authFetch(apiUrl("/api/users"), { method: "GET" });
+          if (response.ok) {
+            const userData = await response.json();
+            setUser({
+              username: userData.username,
+              email: userData.email
+            });
+          } else {
+            // Fallback to mock data if API fails
+            setUser({
+              username: "Robert Karlos",
+              email: "robert@example.com"
+            });
+          }
+        } catch (err) {
+          console.error("Failed to fetch user data:", err);
+          // Fallback to mock data
+          setUser({
+            username: "Robert Karlos",
+            email: "robert@example.com"
+          });
+        }
+      }
     }
+    fetchUserData();
   }, []);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -48,10 +69,24 @@ export default function ProfileHeader({ onSearch }: ProfileHeaderProps) {
     setIsDropdownOpen(false);
   };
 
-  const handleSaveEdit = () => {
+  const handleSaveEdit = async () => {
     if (editUsername.trim()) {
-      setUser(prev => prev ? { ...prev, username: editUsername.trim() } : null);
-      setIsEditing(false);
+      try {
+        const response = await authFetch(apiUrl("/api/users"), {
+          method: "PUT",
+          body: JSON.stringify({ username: editUsername.trim() }),
+        });
+        
+        if (response.ok) {
+          setUser(prev => prev ? { ...prev, username: editUsername.trim() } : null);
+          setIsEditing(false);
+        } else {
+          alert("Failed to update username");
+        }
+      } catch (err) {
+        console.error("Failed to update username:", err);
+        alert("Failed to update username");
+      }
     }
   };
 
@@ -60,11 +95,23 @@ export default function ProfileHeader({ onSearch }: ProfileHeaderProps) {
     setIsEditing(false);
   };
 
-  const handleDeleteProfile = () => {
-    // In a real app, this would call an API to delete the profile
+  const handleDeleteProfile = async () => {
     if (confirm("Are you sure you want to delete your profile? This action cannot be undone.")) {
-      localStorage.removeItem("token");
-      window.location.href = "/";
+      try {
+        const response = await authFetch(apiUrl("/api/users"), {
+          method: "DELETE",
+        });
+        
+        if (response.ok) {
+          localStorage.removeItem("token");
+          window.location.href = "/";
+        } else {
+          alert("Failed to delete profile");
+        }
+      } catch (err) {
+        console.error("Failed to delete profile:", err);
+        alert("Failed to delete profile");
+      }
     }
     setIsDropdownOpen(false);
   };

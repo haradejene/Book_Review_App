@@ -1,9 +1,10 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { authFetch, getBackendUrl, requireAuth, addBookToDefaultShelf } from "@/lib/auth";
+import { requireAuth } from "@/lib/auth";
 import { useRouter } from "next/navigation";
 import { Star } from "lucide-react";
+import { useShelf } from "@/context/ShelfContext";
 
 interface Review {
   id?: string;
@@ -12,13 +13,26 @@ interface Review {
   username?: string;
 }
 
+interface Book {
+  id: number;
+  title: string;
+  author: string;
+  coverUrl: string;
+  genre: string;
+  publishedYear: number;
+}
+
 interface ReviewFormProps {
   bookId: string; // pass bookId for API
   bookCoverUrl: string;
+  bookTitle: string;
+  bookAuthor: string;
+  bookGenre: string;
+  bookPublishedYear: number;
   existingReviews: Review[];
 }
 
-export default function ReviewForm({ bookId, bookCoverUrl, existingReviews }: ReviewFormProps) {
+export default function ReviewForm({ bookId, bookCoverUrl, bookTitle, bookAuthor, bookGenre, bookPublishedYear, existingReviews }: ReviewFormProps) {
   const [rating, setRating] = useState(0);
   const [hoverRating, setHoverRating] = useState(0);
   const [reviewText, setReviewText] = useState("");
@@ -27,6 +41,7 @@ export default function ReviewForm({ bookId, bookCoverUrl, existingReviews }: Re
   const [submitted, setSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);
   const router = useRouter();
+  const { addReview, addBookToShelf } = useShelf();
 
   useEffect(() => {
     if (reviews.length > 0) {
@@ -41,37 +56,34 @@ export default function ReviewForm({ bookId, bookCoverUrl, existingReviews }: Re
     if (rating === 0 || reviewText.trim() === "") return;
     const token = requireAuth(router.push);
     if (!token) return;
-    const newReview: Review = { rating, reviewText };
 
-    // Optimistic UI update
-    setReviews((prev) => [...prev, newReview]);
-    setRating(0);
-    setHoverRating(0);
-    setReviewText("");
-    setSubmitted(true);
-    setTimeout(() => setSubmitted(false), 3000);
-
-    // POST to backend
     try {
       setLoading(true);
-      const res = await authFetch(`${getBackendUrl()}/reviews`, {
-        method: "POST",
-        body: JSON.stringify({
-          bookId,
-          rating: newReview.rating,
-          reviewText: newReview.reviewText,
-        }),
+      const book: Book = {
+        id: Number(bookId),
+        title: bookTitle,
+        author: bookAuthor,
+        coverUrl: bookCoverUrl,
+        genre: bookGenre,
+        publishedYear: bookPublishedYear,
+      };
+
+      await addReview({
+        rating,
+        reviewText,
+        book,
       });
 
-      if (!res.ok) throw new Error("Failed to submit review");
-
-      const savedReview = await res.json();
-
-      // Update review with backend id/username if returned
-      setReviews((prev) => [...prev.slice(0, -1), savedReview]);
+      // Update local reviews for display
+      const newReview: Review = { rating, reviewText };
+      setReviews((prev) => [...prev, newReview]);
+      setRating(0);
+      setHoverRating(0);
+      setReviewText("");
+      setSubmitted(true);
+      setTimeout(() => setSubmitted(false), 3000);
     } catch (err) {
       console.error("Review submission failed:", err);
-      // Optionally remove optimistic update if API fails
     } finally {
       setLoading(false);
     }
@@ -81,11 +93,17 @@ export default function ReviewForm({ bookId, bookCoverUrl, existingReviews }: Re
     const token = requireAuth(router.push);
     if (!token) return;
     try {
-      await addBookToDefaultShelf(Number(bookId));
-      alert("Added to shelf");
+      const book: Book = {
+        id: Number(bookId),
+        title: bookTitle,
+        author: bookAuthor,
+        coverUrl: bookCoverUrl,
+        genre: bookGenre,
+        publishedYear: bookPublishedYear,
+      };
+      await addBookToShelf(book);
     } catch (e) {
       console.error(e);
-      alert("Failed to add to shelf");
     }
   };
 
