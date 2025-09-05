@@ -6,6 +6,7 @@ import Link from "next/link";
 import { Playfair_Display, Poppins, Irish_Grover } from "next/font/google";
 import Header from "../../../components/navigation/Navbar";
 import Footer from "../../../components/navigation/Footer";
+import { apiUrl } from "@/lib/auth";
 
 const irishgroverFont = Irish_Grover({ subsets: ["latin"], weight: "400" });
 const playfair = Playfair_Display({ subsets: ["latin"], weight: ["700"] });
@@ -22,7 +23,7 @@ export default function LoginPage() {
     setError("");
 
     try {
-      const res = await fetch("/api/auth/login", {
+      const res = await fetch(apiUrl("/api/auth/login"), {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password }),
@@ -35,12 +36,13 @@ export default function LoginPage() {
         return;
       }
 
-      // Save token (could be in localStorage, cookies, etc.)
+      // Save token (localStorage for now, can move to cookies later)
       localStorage.setItem("token", data.token);
 
-      // Redirect to homepage or dashboard
+      // Redirect after successful login
       router.push("/");
     } catch (err) {
+      console.error("Login error:", err);
       setError("Something went wrong. Please try again.");
     }
   }
@@ -54,7 +56,9 @@ export default function LoginPage() {
       {/* Login Box */}
       <main className="flex flex-1 m-[37px] justify-center items-center">
         <div className="bg-white/10 p-10 rounded-2xl shadow-xl w-full max-w-md">
-          <h2 className={`text-3xl font-bold mb-6 text-center ${playfair.className}`}>
+          <h2
+            className={`text-3xl font-bold mb-6 text-center ${playfair.className}`}
+          >
             Welcome back!
           </h2>
 

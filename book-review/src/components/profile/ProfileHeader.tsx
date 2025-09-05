@@ -3,6 +3,7 @@
 import { Irish_Grover } from "next/font/google";
 import { useState, useEffect } from "react";
 import Image from "next/image";
+import Link from "next/link";
 
 const irishgroverFont = Irish_Grover({ subsets: ["latin"], weight: "400" });
 
@@ -70,9 +71,9 @@ export default function ProfileHeader({ onSearch }: ProfileHeaderProps) {
 
   return (
     <nav className="flex flex-col sm:flex-row justify-between items-center px-4 sm:px-6 py-4 gap-4 sm:gap-0">
-      <div className={`${irishgroverFont.className} text-xl font-bold text-[#461356]`}>
+      <Link href="/" className={`${irishgroverFont.className} text-xl font-bold text-[#461356]`}>
         Enanbib
-      </div>
+      </Link>
 
       <form
         className="flex items-center w-full sm:w-[450px] rounded-[10px] bg-white text-black pl-4 shadow-lg"

@@ -6,6 +6,7 @@ import Link from "next/link";
 import { Irish_Grover } from "next/font/google";
 import Header from "../../../components/navigation/Navbar";
 import Footer from "../../../components/navigation/Footer";
+import { apiUrl } from "@/lib/auth";
 
 const irishgroverFont = Irish_Grover({ subsets: ["latin"], weight: "400" });
 
@@ -21,7 +22,7 @@ export default function SignupPage() {
     setError("");
 
     try {
-      const res = await fetch("/api/auth/signup", {
+      const res = await fetch(apiUrl("/api/auth/signup"), {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ username, email, password }),
@@ -41,6 +42,7 @@ export default function SignupPage() {
       // Redirect to homepage or dashboard
       router.push("/");
     } catch (err) {
+      console.error("Signup error:", err);
       setError("Something went wrong. Please try again.");
     }
   }

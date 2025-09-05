@@ -6,8 +6,9 @@ import { Irish_Grover } from "next/font/google";
 import { mockBooks } from "@/lib/mockData";
 import Books from "../components/books/BookDetails";
 import Book from "../components/books/BookCard";
+import { apiUrl } from "@/lib/auth";
 
-interface Book {
+interface BookType {
   id: string;
   title: string;
   author: string;
@@ -22,17 +23,20 @@ const irishgroverFont = Irish_Grover({ subsets: ["latin"], weight: "400" });
 
 export default function Home() {
   const [loading, setLoading] = useState(true);
+  const [books, setBooks] = useState<BookType[]>([]);
   const [selectedCategory, setSelectedCategory] = useState<string>("");
   const bookCardsRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     async function fetchBooks() {
       try {
-        const res = await fetch("/api/books");
+        const res = await fetch(apiUrl("/api/books"));
         if (!res.ok) throw new Error("API failed");
-        // Data is fetched but not stored since it's not used in this component
+        const data: BookType[] = await res.json();
+        setBooks(data);
       } catch (err) {
         console.warn("Failed to fetch from API, using mock data:", err);
+        setBooks(mockBooks);
       } finally {
         setLoading(false);
       }
@@ -43,9 +47,9 @@ export default function Home() {
   if (loading) return <p className="text-center text-white">Loading...</p>;
 
   const scrollToBookCards = () => {
-    bookCardsRef.current?.scrollIntoView({ 
-      behavior: 'smooth',
-      block: 'start'
+    bookCardsRef.current?.scrollIntoView({
+      behavior: "smooth",
+      block: "start",
     });
   };
 
@@ -61,7 +65,7 @@ export default function Home() {
             {/* Left Section */}
             <section className="flex-1">
               <div
-                className={`m-6 ${irishgroverFont.className} pt-[149px] pl-[34px] w-full lg:w-[670px] h-auto lg:h-[116px]`}
+                className={`m-6 ${irishgroverFont.className} pt-[149px] pl-[34px] w-full lg:w-[670px]`}
               >
                 <h1 className="text-3xl sm:text-4xl lg:text-5xl text-white font-light">
                   Your Library of Opinions—
@@ -70,7 +74,7 @@ export default function Home() {
                 </h1>
               </div>
 
-              <div className="pt-6 sm:pt-10 lg:pt-[100px] px-4 lg:pl-[50px] w-full lg:w-[547px] h-auto">
+              <div className="pt-6 sm:pt-10 lg:pt-[100px] px-4 lg:pl-[50px] w-full lg:w-[547px]">
                 <h1 className="text-white text-base sm:text-lg">
                   Think of this as your personal book club without the awkward
                   small talk. Scroll through opinions, uncover hidden gems, and
@@ -93,7 +97,9 @@ export default function Home() {
                       alt="books icon"
                     />
                   </div>
-                  <h1 className="text-white text-sm sm:text-base">Book Collections</h1>
+                  <h1 className="text-white text-sm sm:text-base">
+                    Book Collections
+                  </h1>
                 </div>
 
                 <div>
@@ -109,48 +115,58 @@ export default function Home() {
                       alt="reader icon"
                     />
                   </div>
-                  <h1 className="text-white text-sm sm:text-base">Reader Reviews</h1>
+                  <h1 className="text-white text-sm sm:text-base">
+                    Reader Reviews
+                  </h1>
                 </div>
               </div>
 
               <div className="px-4 lg:pl-[40px] pt-6">
-                  <button
+                <button
                   onClick={scrollToBookCards}
                   className={`${irishgroverFont.className} w-full sm:w-[250px] lg:w-[309px] h-[50px] sm:h-[60px] lg:h-[66px] bg-white/10 text-white rounded-lg flex items-center justify-center text-base sm:text-lg hover:bg-white/20 transition-colors cursor-pointer`}
-                  >
-                    Discover Books
-                  </button>
+                >
+                  Discover Books
+                </button>
               </div>
             </section>
 
-            {/* Right Section - Books */}
-            <section className="flex-1 pt-10 lg:pt-[149px] px-4 lg:pr-[34px]">
-              <div className="flex space-x-4 overflow-x-auto pb-4 px-2 sm:px-4 gap-6 sm:gap-10 ml-0 sm:ml-2 max-w-full lg:max-w-[800px]">
-                {Array(5)
-                  .fill(mockBooks)
-                  .flat()
-                  .map((book, index) => (
-                    <div
-                      key={`${book.id}-${index}`}
-                      className="flex-none w-[200px] sm:w-[250px] lg:w-[300px] snap-start flex flex-col items-center"
-                    >
-                      <div
-                        className="w-[200px] sm:w-[250px] lg:w-[300px] h-[280px] sm:h-[350px] lg:h-[400px] rounded-[25px] transition-shadow duration-300 hover:shadow-[0_0_20px_#601A76] bg-center bg-cover m-2 sm:m-4"
-                        style={{ backgroundImage: `url(${book.coverUrl})` }}
-                      ></div>
-                    </div>
-                  ))}
-              </div>
-            </section>
+            {/* Right Section - Featured Books */}
+<section className="flex-1 pt-10 lg:pt-[149px] px-4 lg:pr-[34px]">
+  <div className="flex space-x-4 overflow-x-auto pb-4 px-2 sm:px-4 gap-6 sm:gap-10 ml-0 sm:ml-2 max-w-full lg:max-w-[800px]">
+    {Array(5) // repeat the books 5 times
+      .fill(books)
+      .flat()
+      .map((book, index) => (
+        <div
+          key={`${book.id}-${index}`}
+          className="flex-none w-[200px] sm:w-[250px] lg:w-[300px] snap-start flex flex-col items-center"
+        >
+          <div
+            className="w-[200px] sm:w-[250px] lg:w-[300px] h-[280px] sm:h-[350px] lg:h-[400px] rounded-[25px] transition-shadow duration-300 hover:shadow-[0_0_20px_#601A76] bg-center bg-cover m-2 sm:m-4"
+            style={{ backgroundImage: `url(${book.coverUrl})` }}
+          ></div>
+        </div>
+      ))}
+  </div>
+</section>
+
           </section>
         </div>
       </section>
 
-      {/* Books / BookDetails Components outside Hero */}
+      {/* Books Section */}
       <div className="pt-16 px-4 sm:px-8">
-        <Books selectedCategory={selectedCategory} setSelectedCategory={setSelectedCategory} />
+        <Books
+          selectedCategory={selectedCategory}
+          setSelectedCategory={setSelectedCategory}
+        />
         <div ref={bookCardsRef} data-book-cards>
-          <Book selectedCategory={selectedCategory} setSelectedCategory={setSelectedCategory} />
+          <Book
+            books={books}
+            selectedCategory={selectedCategory}
+            setSelectedCategory={setSelectedCategory}
+          />
         </div>
       </div>
 

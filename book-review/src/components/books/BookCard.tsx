@@ -1,10 +1,10 @@
 "use client";
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { Irish_Grover } from "next/font/google";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
-import { mockBooks } from "../../lib/mockData";
 import { calculateAverageRating, getMockReviewsForBook } from "../../lib/ratingUtils";
+import { requireAuth, addBookToDefaultShelf } from "@/lib/auth";
 
 const irishgroverFont = Irish_Grover({ subsets: ["latin"], weight: "400" });
 
@@ -20,48 +20,27 @@ interface Book {
 }
 
 interface BookCardProps {
+  books: Book[];
   selectedCategory: string;
   setSelectedCategory: (category: string) => void;
 }
 
-export default function Books({ selectedCategory, setSelectedCategory }: BookCardProps) {
-  const [books, setBooks] = useState<Book[]>([]);
-  const [loading, setLoading] = useState(true);
+export default function Books({ books, selectedCategory, setSelectedCategory }: BookCardProps) {
   const [searchTerm, setSearchTerm] = useState("");
   const router = useRouter();
 
-  useEffect(() => {
-    async function fetchBooks() {
-      try {
-        const res = await fetch("/api/books");
-        if (!res.ok) throw new Error("API failed");
-        const data = await res.json();
-        setBooks(data);
-      } catch (err) {
-        console.warn("Failed to fetch from API, using mock data:", err);
-        setBooks(mockBooks);
-      } finally {
-        setLoading(false);
-      }
-    }
-    fetchBooks();
-  }, []);
-
-  if (loading) return <p>Loading...</p>;
-
   // Filter books by search term and selected category
-  const filteredBooks = books.filter(
-    (book) => {
-      const matchesSearch = 
+  const filteredBooks = books.filter((book) => {
+    const matchesSearch =
       book.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
       book.author.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        book.genre.toLowerCase().includes(searchTerm.toLowerCase());
-      
-      const matchesCategory = selectedCategory === "" || book.genre === selectedCategory;
-      
-      return matchesSearch && matchesCategory;
-    }
-  );
+      book.genre.toLowerCase().includes(searchTerm.toLowerCase());
+
+    const matchesCategory =
+      selectedCategory === "" || book.genre === selectedCategory;
+
+    return matchesSearch && matchesCategory;
+  });
 
   const clearFilter = () => {
     setSelectedCategory("");
@@ -69,12 +48,27 @@ export default function Books({ selectedCategory, setSelectedCategory }: BookCar
   };
 
   const handleRateClick = (bookId: string) => {
+    const token = requireAuth(router.push);
+    if (!token) return;
     router.push(`/reviews/${bookId}`);
+  };
+
+  const handleAddToShelf = async (bookId: number) => {
+    const token = requireAuth(router.push);
+    if (!token) return;
+    try {
+      await addBookToDefaultShelf(bookId);
+      alert("Added to shelf");
+    } catch (e) {
+      console.error(e);
+      alert("Failed to add to shelf");
+    }
   };
 
   return (
     <>
-      <div className="flex flex-col sm:flex-row">
+      {/* Header + Search */}
+      <div className="flex flex-col sm:flex-row items-center sm:items-start">
         <h1
           className={`${irishgroverFont.className} text-[#601A76] text-[32px] sm:text-[40px] md:text-[48px] pb-4 m-2 text-center sm:text-left`}
         >
@@ -85,9 +79,9 @@ export default function Books({ selectedCategory, setSelectedCategory }: BookCar
             </span>
           )}
         </h1>
-        <div className="pb-4 m-2 sm:pl-[700px] pt-4 h-[30px] w-full sm:w-auto">
+        <div className="pb-4 m-2 sm:ml-auto pt-2 w-full sm:w-auto">
           <form
-            className="w-full sm:w-[450px] rounded-[10px] bg-white text-black flex pl-4 shadow-lg mx-auto sm:mx-0"
+            className="w-full sm:w-[450px] rounded-[10px] bg-white text-black flex pl-4 shadow-lg"
             onSubmit={(e) => e.preventDefault()} // prevent reload
           >
             <input
@@ -117,11 +111,12 @@ export default function Books({ selectedCategory, setSelectedCategory }: BookCar
         </div>
       )}
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-y-8 sm:gap-y-20 gap-x-4 sm:gap-x-60 p-4 sm:p-8 w-full sm:w-[1200px] mx-auto sm:ml-10">
+      {/* Book Grid */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-y-8 sm:gap-y-20 gap-x-4 sm:gap-x-12 p-4 sm:p-8 w-full sm:w-[1200px] mx-auto">
         {filteredBooks.length > 0 ? (
-          filteredBooks.map((book, index) => (
+          filteredBooks.map((book) => (
             <div
-              key={index}
+              key={book.id}
               className="relative bg-white rounded-2xl shadow-lg overflow-visible group hover:shadow-2xl transition duration-300 pb-20"
             >
               {/* Main card content */}
@@ -139,8 +134,7 @@ export default function Books({ selectedCategory, setSelectedCategory }: BookCar
                       <span className="font-bold">Title:</span> {book.title}
                     </h2>
                     <p className="text-gray-600 text-sm text-center md:text-left">
-                      <span className="font-bold">Author:</span>{" "}
-                      {book.author}
+                      <span className="font-bold">Author:</span> {book.author}
                     </p>
                     <p className="mt-2 text-gray-700 text-sm line-clamp-4 text-center md:text-left">
                       <span className="font-bold">Description:</span>{" "}
@@ -155,15 +149,19 @@ export default function Books({ selectedCategory, setSelectedCategory }: BookCar
                 <div className="bg-[#f9f9f9] rounded-xl shadow-md w-full p-4">
                   <div className="flex flex-col sm:flex-row justify-between items-center gap-2 sm:gap-0">
                     <Image src="/Frame 6.svg" alt="rating" width={120} height={30} />
-                    <h1 className="font-bold underline">{calculateAverageRating(getMockReviewsForBook(book.id))}</h1>
-                    <p className="text-sm text-center sm:text-left">1289 ratings • 714 Reviews</p>
+                    <h1 className="font-bold underline">
+                      {calculateAverageRating(getMockReviewsForBook(book.id))}
+                    </h1>
+                    <p className="text-sm text-center sm:text-left">
+                      1289 ratings • 714 Reviews
+                    </p>
                   </div>
 
                   <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-2 mt-4">
-                    <button className="bg-[#8D27AE] text-white px-4 py-1 rounded-full text-sm shadow hover:bg-[#6b1d8e] transition">
+                    <button onClick={() => handleAddToShelf(Number(book.id))} className="bg-[#8D27AE] text-white px-4 py-1 rounded-full text-sm shadow hover:bg-[#6b1d8e] transition">
                       Add to Shelf
                     </button>
-                    <button 
+                    <button
                       onClick={() => handleRateClick(book.id)}
                       className="bg-gray-200 text-gray-700 px-4 py-1 rounded-full text-sm hover:bg-gray-300 transition cursor-pointer"
                     >
@@ -178,8 +176,8 @@ export default function Books({ selectedCategory, setSelectedCategory }: BookCar
           <div className="col-span-1 sm:col-span-2 text-center">
             {selectedCategory ? (
               <div className="space-y-4">
-                <p className={`text-gray-500 text-lg">
-                  No books found in the "{selectedCategory}" category.`}>
+                <p className="text-gray-500 text-lg">
+                  No books found in the &quot;{selectedCategory}&quot; category.
                 </p>
                 <button
                   onClick={clearFilter}
