@@ -3,7 +3,7 @@
 A collaborative web application that allows users to browse, write, and manage book reviews.
 
 🌐 **Live Demo:** [Book Review App](https://book-review-app-11.onrender.com)  
-🎥 **Demo Video:** [Watch Here](https://book-review-app-11.onrender.com)
+🎥 **Demo Video:** [Watch Here](https://youtu.be/NoocQMMxBZs)
 
 ---
 
