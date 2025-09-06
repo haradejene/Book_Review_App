@@ -3,7 +3,7 @@
 A collaborative web application that allows users to browse, write, and manage book reviews.
 
 🌐 **Live Demo:** [Book Review App](https://book-review-app-11.onrender.com)  
-🎥 **Demo Video:** [Watch Here](https://youtu.be/Whp36Z6Q83Y)
+🎥 **Demo Video:** [Watch Here](https://book-review-app-11.onrender.com)
 
 ---
 
@@ -27,7 +27,7 @@ A collaborative web application that allows users to browse, write, and manage b
 
 ## 🌐 Live Demo Overview
 
-Check out the deployed app here: [Book Review App](https://book-review-app-2-lf26.onrender.com/)
+Check out the deployed app here: [Book Review App](https://book-review-app-11.onrender.com)
 
 What you can do in the live demo:
 
